@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+		{% load static %}
+
+    	<link rel="stylesheet" href="../../static/groupgrader/baseForStatusPage.css">
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+		<script src="https://code.jquery.com/jquery-3.6.3.min.js"
+		integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+		crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+		<script src={% static 'groupgrader/groupgrader.js' %}></script>
+		<title> {% block title %}{% endblock %} </title>
+
+	</head>
+
+
+	<body>
+
+		<div class="d-flex flex-column flex-shrink-0 p-3" style="width: 15%;height:100vh;background-color:rgba(83, 148, 192, 0.608);">
+			<a href={% url 'dashboard' %} class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+			  <span class="fs-4">GroupGrader</span>
+			</a>
+			<hr>
+			<ul class="nav nav-pills flex-column mb-auto">
+			  <li class="nav-item">
+
+				{% block sidebar-content %}
+
+				{% endblock %}
+
+				</li>
+			</ul>
+
+			<hr>
+
+			<div class="dropdown">
+
+			  <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown">
+				<!-- TODO: Change this to real photo's id -->
+				<img src="#" alt="Img Not Found" onerror="this.src='../../static/assets/default-user-icon.png'" width="32" height="32" class="rounded-circle me-2">
+				<strong>Ging</strong>
+			  </a>
+			  
+			  <ul class="dropdown-menu text-small shadow">
+				<li><a class="dropdown-item" href="#">Profile</a></li>
+				<li><hr class="dropdown-divider"></li>
+				<li><a class="dropdown-item" href={% url 'logout' %}>Log out</a></li>
+			  </ul>
+			</div>
+		</div>
+
+
+
+		<div class="main-content">
+			<!-- <div class="page-name" id="id_page_name">
+				{% block page-name %}
+				{% endblock %}
+			</div>
+	
+			{% if message %}
+				<div class="message">
+					{{message}}
+				</div>
+			{% endif %}
+	
+			<div class="course-content">
+				
+			</div> -->
+			{% block content %}
+			{% endblock %}
+		</div>
+
+
+	</body>
+</html>

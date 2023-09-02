@@ -1,0 +1,94 @@
+{% extends "groupgrader/base.html" %}
+
+{% block title %} grader assignment page {% endblock %} 
+
+{% block sidebar-content %}
+    <a href="{% url 'grader-dashboard' %}" id="id_nav_index" class="nav-link link-dark">
+        Dashboard
+    </a>
+    <a href="{% url 'grader-course' course.course_num %}" id="id_nav_index" class="nav-link link-dark">
+        Back to Course
+    </a>
+    <a href="{% url 'grader-assignment' assignment.id %}" id="id_nav_index" class="nav-link link-dark">
+        Back to {{assignment.name}} Page
+    </a>
+
+    <!-- Release Score Modal -->
+    {% if not_released %}
+    <button type="button" class="btn btn-border-width=0" data-bs-toggle="modal" data-bs-target="#release_score_modal">
+        Release Score
+    </button>
+    {% endif %}
+    <div class="modal fade" id="release_score_modal" tabindex="-1" aria-labelledby="releaseScoreModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="releaseScoreModalTitle">Release Score</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Do you confirm to release this assignment's score to all students?
+            </div>
+            <div class="modal-footer">
+            <form action = "{% url 'grader-release-score' course.course_num assignment.name %}" method="POST">
+                <button type="submit" class="btn btn-primary">Yes, release</button>
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <hr>
+    
+    </div>
+{% endblock %}
+{% block content %}
+
+
+
+
+  
+<div class="container-fluid mt-3">
+  <h1>{{assignment.name}} Grading </h1>
+  <h1><p1 class="lead">Statistics: {{statistics}}</p1></h1>
+  <h1><p1 class="lead">Missing submissions: {{missing_submission}}</p1></h1>
+  <hr class="mt-5">
+  <div class="row">
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Student id
+        </p>
+    </div>
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Graded
+        </p>
+    </div>
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Score
+        </p>
+    </div>
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Submission Date
+        </p>
+    </div>
+</div>
+
+<hr class="mt-3">
+<div id="id_submission_list">
+
+</div>
+
+
+<script>
+    const submissionURL = "{% url 'grader-grade' 0 9999 %}"
+    window.onload = getSubmissionList("{{course.course_num}}","{{assignment.name}}");
+
+    window.setInterval(getSubmissionList, 5000, "{{course.course_num}}", "{{assignment.name}}");
+</script>
+
+{% endblock %}

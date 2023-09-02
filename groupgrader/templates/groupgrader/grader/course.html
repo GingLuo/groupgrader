@@ -1,0 +1,142 @@
+{% extends "groupgrader/base.html" %}
+
+{% block title %} grader course page {% endblock %} 
+
+{% block sidebar-content %}
+<a href="{% url 'grader-dashboard' %}" id="id_nav_index" class="nav-link link-dark">
+  Dashboard
+</a>
+<a href="{% url 'grader-leave-course' course.course_num %}" id="id_nav_index" class="nav-link link-dark">
+    Leave This Course
+</a>
+
+<a class="btn btn-border-width=0" data-bs-toggle="modal" href="#id_question_cnt_modal" style="text-align: left;">Create Assignment</a>
+<!-- Modal -->
+<div class="modal fade" id="id_question_cnt_modal" aria-hidden="true" aria-labelledby="questionCountInput" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="questionCountInput">Question Number</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <label for="id_input_big_question_num">Please enter the number of big questions to generate rubric form</label>
+          <input type="number" id="id_input_big_question_num" required>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-light" id="id_generate_rubric_form_btn" onclick="createRubricForm()" data-bs-target="#id_rubric_form_creator" data-bs-toggle="modal" data-bs-dismiss="modal">Start input rubric</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="id_rubric_form_creator" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" aria-labelledby="rubricFormCreator" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rubricFormCreator">Assignment Creation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="id_create_assignment_form" class="row g-3">
+            <div class="col-sm-6 mb-3">
+              <label for="id_assignment_name" class="form-label">Please input assignment name</label>
+              <input class="form-control" type="text" id="id_assignment_name" name="id_assignment_name" REQUIRED>
+            </div>
+            <div class="col-sm-6 mb-3">
+              <label for="id_assignment_total_score" class="form-label">Please enter total score</label>
+              <input class="form-control" type="number" step="1" id="id_assignment_total_score" name="id_assignment_total_score" VALUE="0">
+            </div>
+            <div class="col-sm-6 mb-3">
+              <label for="id_grader_assn_file" class="form-label">Please upload writeup or handout pdf here</label>
+              <input class="form-control" type="file" id="id_grader_assn_file" name="id_grader_assn_file">
+            </div>
+            <div class="col-sm-6 mb-3">
+              <label for="id_due_date" class="form-label">Please select due date</label>
+              <input id='id_due_date' name="id_due_date" type='datetime-local' class="form-control" value="2023-04-01T23:59" REQUIRED/>
+            </div>
+            <div class="mb-3" id="id_insert_rubric_form"></div>
+            <div class="alert alert-info" style="background-color: rgba(240, 248, 255, 0.651);">
+              <h6 class="font-weight-light lead">
+                Note:
+                <br> - Assignment Name must be unique and non-empty. 
+                <br> - Due date must be entered fully.
+                <br> - If total score is empty, it will be treated as 0.
+                <br> - Sub-questions need to sum up to total score.
+                <br> - Handout is optional.
+              </p1>
+              <h6>
+              </div>
+            </form>
+            <div class="modal-footer">
+            <button class="btn btn-light" data-bs-target="#id_question_cnt_modal" data-bs-toggle="modal">Edit big question number</button>
+          <button type="submit" class="btn btn-light" onclick="createAssignment('{{course.course_num}}')" data-bs-dismiss="modal">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid mt-4">
+    <hr>
+
+</div>
+
+
+
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+  
+<div class="container-fluid mt-3">
+  <h1>{{course.course_num}}</h1>
+  <p>{{course.course_name}}</p>
+  <hr class="mt-5">
+  <div class="row">
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Name
+        </p>
+    </div>
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Due Date
+        </p>
+    </div>
+    <div class="col-sm-2 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            # Submissions
+        </p>
+    </div>
+    <div class="col-sm-2 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            % Graded
+        </p>
+    </div>
+    <div class="col-sm-2 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Published
+        </p>
+    </div>
+</div>
+
+
+<hr class="mt-3">
+<div id="id_assignment_list">
+</div>
+<script>
+    const createAssignmentURL = "{% url 'create-assignment' 0 %}"
+    const assignmentURL = "{% url 'grader-assignment' 1 %}"
+    const courseNum = "{{course.course_num}}"
+
+    window.onload = getGraderAssignmentList("{{course.course_num}}");
+
+    window.setInterval(getGraderAssignmentList, 5000, "{{course.course_num}}");
+</script>
+  
+</div>
+
+{% endblock %}

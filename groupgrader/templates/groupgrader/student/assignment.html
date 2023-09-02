@@ -1,0 +1,172 @@
+{% extends "groupgrader/base.html" %}
+
+{% block title %} student assignment page {% endblock %} 
+
+{% block sidebar-content %}
+    <a href="{% url 'student-dashboard' %}" id="id_nav_index" class="nav-link link-dark">
+        Dashboard
+    </a>
+    <a href="{% url 'student-course' course_num %}" id="id_nav_index" class="nav-link link-dark">
+        Back to Course
+    </a>
+
+    <button type="button" class="btn btn-border-width=0" onclick="downloadPDF('{{assignment.id}}')" style="text-align: left;">Download Original</button>
+    
+    <hr>
+    {% if assignment.is_graded %}
+    <p1 class="lead">Status: Graded</p1>
+    {% else %}
+    <a class="btn btn-border-width=0" data-bs-toggle="modal" 
+        href="#id_resubmit" role="button">Resubmit</a>
+    <hr>
+    <a class="btn btn-border-width=0" data-bs-toggle="modal" 
+        href="#id_select_page" role="button">Select Page</a>
+    {% endif %}
+
+
+
+    <div class="modal fade" id="id_select_page" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rubricFormCreator">Select Pages</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <br>
+                <form id="id_submit_assignment_form" class="row g-3 justify-content-center align-center">
+
+                </form>
+                <h6 class="font-weight-light"><br>Feel free to close the dialogue and resume selection anytime!
+                    <br><br>Page number is at least 1 and at most the max page number.</h6>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-info" data-bs-dismiss="modal" onclick="selectPage('{{assignment.id}}')">Done</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="id_resubmit" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" aria-labelledby="rubricFormCreator" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="rubricFormCreator">Resubmit Assignment</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="id_submit_assignment_form" class="row g-3">
+                  <div class="col-sm-12 mb-3">
+                    <label for="id_assn_file" class="form-label">Please upload pdf here</label>
+                    <input class="form-control" type="file" id="id_assn_file" name="id_assn_file">
+                  </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-info" data-bs-dismiss="modal" onclick="resubmitAssignment('{{assignment.id}}')">Resubmit</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+    <hr>
+
+    
+    <header>
+        <p1 class="lead" style="font-size:20px;">Navigate PDF</p1>
+        <br>
+            <div class="navigation__item">
+
+                <p1 class="lead" style="font-size:15px;">
+                    Page
+                    <span id="page_num"></span>
+                    of
+                    <span id="page_count"></span>
+                    &nbsp;
+                </p1>
+
+                <a href="#" class="previous round" id="prev_page">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+    
+                <input type="number" value="1" id="current_page" style="width:30%;text-align:center;" hidden/>
+    
+                <a href="#" class="next round" id="next_page">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+    
+            </div>
+    
+            <div class="navigation__item">
+                <p1 class="lead" style="font-size:15px;">Zoom in/out&nbsp;&nbsp;</p1>
+                
+                <button class="zoom" id="zoom_in">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+    
+                <button class="zoom" id="zoom_out">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+            </div>
+    </header>
+
+    {% if assignment.is_graded %}
+    <hr>
+    <div class="container-fluid alert alert-secondary">
+        <p1 class="lead">Good work!<br>Total score:<br> {{assignment.total_score}} out of {{assignment.full_score}}</p1>
+    
+    </div>
+
+
+    {% endif %}
+
+
+{% endblock %}
+
+{% block content %}
+
+    <script>
+
+        var pdf = "{% url 'get-pdf' assignment.id %}"
+        window.onload = renderPDF(1);
+
+        // Load the document.
+        window.onload = makeSelectPageModal('{{assignment.id}}');
+        console.log('{{assignment.is_graded}}')
+        console.log('{{assignment.is_released}}')
+        if ('{{assignment.is_graded}}' && '{{assignment.is_released}}'){
+            window.onload = makeScoreBreakDown('{{assignment.id}}');
+        }
+
+    </script>
+
+    {% if assignment.is_graded and assignment.is_released %}
+    <div class="row">
+        <div class="col-sm-8 p-2">
+            <div id="canvas-wrapper" style="margin:auto;">
+
+                <canvas id="canvas" class="canvas__container"></canvas>
+            
+            </div>
+        </div>
+        <div class="col-sm-4 p-2">
+            <br>
+            <hr>
+            <div id="id_score_breakdown" class="container-fluid">
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+
+    <div id="canvas-wrapper" style="margin:auto;">
+
+        <canvas id="canvas" class="canvas__container"></canvas>
+
+    </div>
+
+    {% endif %}
+
+
+{% endblock %}

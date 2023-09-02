@@ -1,0 +1,61 @@
+{% extends "groupgrader/base.html" %}
+
+{% block title %} student course page {% endblock %} 
+
+{% block sidebar-content %}
+<a href="{% url 'student-dashboard' %}" id="id_nav_index" class="nav-link link-dark">
+    Dashboard
+</a>
+<a href="{% url 'student-leave-course' course.course_num %}" id="id_nav_index" class="nav-link link-dark">
+    Leave This Course
+</a>
+
+<div class="container-fluid mt-4">
+    <hr>
+
+</div>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+  
+<div class="container-fluid mt-3">
+  <h1>{{course.course_num}}</h1>
+  <p>{{course.course_name}}</p>
+  <hr class="mt-5">
+  <div class="row">
+    <div class="col-sm-4 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Name
+        </p>
+    </div>
+    <div class="col-sm-4 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Status
+        </p>
+    </div>
+    <div class="col-sm-4 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Due Date
+        </p>
+    </div>
+  </div>
+
+<hr class="mt-3">
+
+<div id="id_assignment_list">
+
+</div>
+
+<script>
+    var assignmentURL = "{% url 'student-assignment' 1 %}"
+    window.onload = getStudentAssignmentList("{{course.course_num}}");
+
+    window.setInterval(getStudentAssignmentList, 5000, "{{course.course_num}}");
+</script>
+
+{% endblock %}

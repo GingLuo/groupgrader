@@ -1,0 +1,130 @@
+{% extends "groupgrader/base.html" %}
+
+{% block title %} grader assignment page {% endblock %} 
+
+{% block sidebar-content %}
+    <a href="{% url 'grader-dashboard' %}" id="id_nav_index" class="nav-link link-dark">
+        Dashboard
+    </a>
+    <a href="{% url 'grader-course' course.course_num %}" id="id_nav_index" class="nav-link link-dark">
+        Back to Course
+    </a>
+    <a href="{% url 'grader-assignment' assignment.id %}" id="id_nav_index" class="nav-link link-dark">
+        Back to {{assignment.name}} Page
+    </a>
+    <div class="container-fluid">
+        <hr>
+    
+    </div>
+    {% if from_group_grading %}
+    <a href="{% url 'group-grading' course.course_num assignment.id %}" id="id_nav_index" class="nav-link link-dark">
+        Back to Group Grading Page
+    </a>
+    {% endif %}
+
+    <header>
+        <p1 class="lead" style="font-size:20px;">Navigate PDF</p1>
+        <br>
+            <div class="navigation__item">
+                <p1 class="lead" style="font-size:15px;">
+                    Page
+                    <span id="page_num"></span>
+                    of
+                    <span id="page_count"></span>
+                    &nbsp;
+                </p1>
+
+                <a href="#" class="previous round" id="prev_page">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+    
+                <input type="number" value="1" id="current_page" style="width:30%;text-align:center;" hidden/>
+    
+                <a href="#" class="next round" id="next_page">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+    
+            </div>
+    
+            <div class="navigation__item">
+                <p1 class="lead" style="font-size:15px;">Zoom in/out&nbsp;&nbsp;</p1>
+                
+                <button class="zoom" id="zoom_in">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+    
+                <button class="zoom" id="zoom_out">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+            </div>
+    </header>
+
+
+    {% if assignment.is_graded %}
+    <hr>
+    <div class="container-fluid alert alert-secondary">
+        <p1 class="lead">Already Graded<br>Total score:<br> {{assignment.total_score}} out of {{assignment.full_score}}</p1>
+    
+    </div>
+
+
+    {% endif %}
+
+
+
+
+{% endblock %}
+
+
+
+
+{% block content %}
+
+<script>
+    var pdf = "{% url 'get-pdf' assignment.id %}"
+    window.onload = renderPDF(1);
+    // Load the document.
+    window.onload = makeGradingForm("{{assignment.id}}","{{from_group_grading}}");
+    if ('{{assignment.is_graded}}'=='True'){
+            console.log("Grader grade true")
+        }
+
+</script>
+
+
+
+{% if assignment.is_graded %}
+
+
+<div id="canvas-wrapper" style="margin:auto;">
+
+    <canvas id="canvas" class="canvas__container"></canvas>
+
+</div>
+
+{% else %}
+
+<div class="row">
+    <div class="col-sm-8 p-2">
+        <div id="canvas-wrapper" style="margin:auto;">
+    
+            <canvas id="canvas" class="canvas__container"></canvas>
+        
+        </div>
+    </div>
+    
+    <div class="col-sm-4 p-2">
+        <br>
+        <hr>
+        <form id="id_grader_grading_form">
+            
+        </form>
+    </div>
+</div>
+
+{% endif %}
+
+
+
+
+{% endblock %}

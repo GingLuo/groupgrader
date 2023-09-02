@@ -1,0 +1,66 @@
+{% extends "groupgrader/base.html" %}
+
+{% block title %} student dashboard page {% endblock %} 
+
+{% block sidebar-content %}
+
+<button type="button" class="btn btn-border-width=0" data-bs-toggle="modal" data-bs-target="#create_course_form">
+  Enroll in course
+</button>
+<hr>
+<p1 class="lead mt-1">
+    Welcome to GroupGrader! 
+</p>
+<p1 class="lead mt-1">
+    {{dashboard_message}}
+</p>
+
+<!-- Modal -->
+<div class="modal fade" id="create_course_form" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Enroll in a course</h5>
+        <button data-bs-dismiss="modal" type="button" class="btn-close" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form class="row g-3" id="id_create_course_form">
+          <div class="col-md-6">
+            <label for="id_input_course_num_enroll" class="form-label">Course No.#</label>
+            <input type="number" class="form-control" id="id_input_course_num_enroll">
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-info" onclick="enrollCourseStudent()" 
+            data-bs-dismiss="modal">Enroll</button>
+            {% csrf_token %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block content %}
+
+<h3 style="margin-top:5vh; margin-left:1vw"> My courses </h3>
+<hr>
+<div class="container-fluid mt-3">
+  <div class="row" id="id_course_list">
+      
+  </div>
+</div>
+
+<script>
+  var courseURL = "{% url 'student-course' 0 %}"
+  window.onload = getStudentCourseList;
+
+  window.setInterval(getStudentCourseList, 5000);
+</script>
+
+
+
+{% endblock %}

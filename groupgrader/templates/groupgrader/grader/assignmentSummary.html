@@ -1,0 +1,144 @@
+{% extends "groupgrader/base.html" %}
+
+{% block title %} grader assignment page {% endblock %} 
+
+{% block sidebar-content %}
+    <a href="{% url 'grader-dashboard' %}" id="id_nav_index" class="nav-link link-dark">
+        Dashboard
+    </a>
+    <a href="{% url 'grader-course' course.course_num %}" id="id_nav_index" class="nav-link link-dark">
+        Back to Course
+    </a>
+
+    <a href="{% url 'grader-statistics' course.course_num assignment.name %}" id="id_nav_index" class="nav-link link-dark">
+        Statistics
+    </a>
+    <!-- Release Score Modal -->
+    {% if not_released %}
+    <button type="button" class="btn btn-border-width=0" data-bs-toggle="modal" data-bs-target="#release_score_modal">
+        Release Score
+    </button>
+    {% endif %}
+    <div class="modal fade" id="release_score_modal" tabindex="-1" aria-labelledby="releaseScoreModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="releaseScoreModalTitle">Release Grade </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Do you confirm to release this assignment's score to all students?
+            </div>
+            <div class="modal-footer">
+            <form action = "{% url 'grader-release-score' course.course_num assignment.name %}" method="POST">
+                <button type="submit" class="btn btn-primary">Yes, release</button>
+                {% csrf_token %}
+            </form>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <!-- Group Grading Modal -->
+    <button type="button" class="btn btn-border-width=0" data-bs-toggle="modal" data-bs-target="#group_grading_modal">
+        Group Grading
+    </button>
+    <div class="modal fade" id="group_grading_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="groupGradingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="groupGradingModalLabel">Group Grading</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'group-grading' course.course_num assignment.id %}" method="post">
+                    {% for student in enrolled_students %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="id_group_selected_{{student.user_id}}" name="group_selected_{{student.user_id}}">
+                            <label class="form-check-label" for="id_group_selected_{{student.user_id}}">
+                                {{student.nickname}}
+                            </label>
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-info">Confirm group</button>
+                    <h6 class="font-weight-light lead">
+                        Please select some students as your group to grade for this assignment.
+                        <br>
+                        Each new selection will overwrite last time's group selection.
+                      <h6>
+                    {% csrf_token %}
+                </form>
+
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <hr>
+    
+    </div>
+{% endblock %}
+{% block content %}
+
+
+
+
+  
+<div class="container-fluid mt-3">
+    <br>
+  <h3>{{assignment.name}} Grading Summary</h3>
+  {% if not assignment.is_released %}
+    {% if not all_submitted %}
+    <h3>
+        <span>Please start grading only after </span>
+        <span>
+            <a href={% url 'grader-statistics' course.course_num assignment.name %}>
+                everyone has submitted!
+            </a>
+        </span>
+    </h3>
+    {% endif %}
+  {% endif %}
+  <hr class="mt-5">
+  <div class="row">
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Student id
+        </p>
+    </div>
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Graded
+        </p>
+    </div>
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Score
+        </p>
+    </div>
+    <div class="col-sm-3 p-2 text-white text-center" style="background-color:rgba(4, 14, 24, 0.781);">
+        <p1 class="lead">
+            Submission Date
+        </p>
+    </div>
+</div>
+
+<hr class="mt-3">
+<!-- TODO: Change this to for later -->
+<div id="id_submission_list">
+
+</div>
+
+
+<script>
+    const submissionURL = "{% url 'grader-grade' 0 9999 %}"
+    window.onload = getSubmissionList("{{course.course_num}}","{{assignment.name}}");
+
+    // ... also call getList every 5 seconds hereafter to update the list
+    window.setInterval(getSubmissionList, 5000, "{{course.course_num}}", "{{assignment.name}}");
+</script>
+
+{% endblock %}
